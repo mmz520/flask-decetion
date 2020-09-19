@@ -32,6 +32,10 @@ import math
 import random
 import os
 
+width=1920
+height=1080
+
+
 def sample(probs):
     s = sum(probs)
     probs = [a/s for a in probs]
@@ -138,10 +142,10 @@ copy_image_from_bytes = lib.copy_image_from_bytes
 copy_image_from_bytes.argtypes = [IMAGE,c_char_p]
 
 def network_width(net):
-    return lib.network_width(net)
+    return width
 
 def network_height(net):
-    return lib.network_height(net)
+    return height
 
 predict = lib.network_predict_ptr
 predict.argtypes = [c_void_p, POINTER(c_float)]

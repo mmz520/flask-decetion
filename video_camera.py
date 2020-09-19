@@ -1,7 +1,8 @@
 import cv2
 from get_derection import get_img
 import time
-
+from ptz import paste
+from PIL import Image
 
 
 class VideoCamera(object):
@@ -14,8 +15,8 @@ class VideoCamera(object):
         else:
             path+='02'
         
-        if(index==-1):
-            path='out.mp4'
+        if(index==-1 or index=='-1'):
+            path='bird.mp4'
         
         #fps = 5
         #fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -37,8 +38,11 @@ class VideoCamera(object):
         
         # 因为opencv读取的图片并非jpeg格式，因此要用motion JPEG模式需要先将图片转码成jpg格式图片
         if(self.enable_detect=='true'):
+            #print("==========================")
             image=get_img(image)
+            
         #self.out.write(image)
+        #image=paste(Image.fromarray(image),cv2.imread('test.png',cv2.IMREAD_UNCHANGED))
         ret, jpeg = cv2.imencode('.jpg', image)
         #time.sleep(1/30)
         return jpeg.tobytes()

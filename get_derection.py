@@ -8,15 +8,16 @@ from target import Target
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 
+
 netMain = None
 metaMain = None
 altNames = None
 
 last=[]
 
-configPath = "./cfg/yolov4.cfg"
-weightPath = "./yolov4.weights"
-metaPath = "./cfg/coco.data"
+configPath = "./cfg/yolo4-obj.cfg"
+weightPath = "./yolo4-obj_final.weights"
+metaPath = "./data/obj.data"
 
 netMain = darknet.load_net_custom(configPath.encode(
             "ascii"), weightPath.encode("ascii"), 0, 1)
@@ -25,6 +26,7 @@ metaMain = darknet.load_meta(metaPath.encode("ascii"))
 darknet_image = darknet.make_image(darknet.network_width(netMain),
     darknet.network_height(netMain),3)
 
+print(type(darknet_image))
 
 def cv2ImgAddText(img, text, left, top, textColor=(0, 255, 0), textSize=20):
     if (isinstance(img, np.ndarray)):  #判断是否OpenCV图片类型
@@ -50,6 +52,7 @@ def convertBack(x, y, w, h):
     return xmin, ymin, xmax, ymax
 
 def cvDrawBoxes(detections, img,left=0,top=0,textColor=(0, 255, 0),textSize=15):
+    #print("aaaaaaaaaaaaaaaaaaaa"+str(len(detections)))
     list_find=[]
     for index in range(len(detections)) :
         name=detections[index][0].decode()
@@ -76,7 +79,7 @@ def cvDrawBoxes(detections, img,left=0,top=0,textColor=(0, 255, 0),textSize=15):
     for index in range(len(list_find)) :
         text=list_find[index].name+":"+str(list_find[index].count) 
         img=cv2ImgAddText(img, text, left, top+textSize*index, textColor, textSize)
-    img=cv2.resize(img,(640,480))
+    #img=cv2.resize(img,(640,480))
     deal_object(list_find,img)
 
     return img
@@ -90,7 +93,10 @@ def get_img(frame_read):
 
     darknet.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
     detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=0.25)
-    image = cvDrawBoxes(detections, frame_resized,500,10,(255,0,51),15)
+    matImage=np.zeros((darknet.network_height(netMain),darknet.network_width(netMain),3),np.uint8)
+    image = cvDrawBoxes(detections, frame_resized,darknet.network_width(netMain)-150,10,(255,0,51),15)
+    #cv2.imwrite("test.jpg",image)
+    #image = cvDrawBoxes(detections, frame_resized,500,10,(255,0,51),15)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     return image
 
